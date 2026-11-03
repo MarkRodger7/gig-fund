@@ -73,6 +73,7 @@ h1{font:600 32px/1.15 "Work Sans",Arial,Helvetica,sans-serif;margin:0;letter-spa
 .ranges button:hover{background:var(--soft)}
 .ranges button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
 .period{font-size:13px;font-weight:700}
+.chart-note{margin:10px 0 0;font-size:12px;color:var(--muted)}
 .grid>.card:first-child{display:flex;flex-direction:column}
 .chart-box{position:relative;height:280px;flex:1 1 auto;min-height:280px}
 .alloc-box{position:relative;height:200px;margin-bottom:12px}
@@ -175,6 +176,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--link);outline-o
           </div>
         </div>
         <div class="chart-box"><canvas id="valueChart" aria-label="Portfolio value over time"></canvas></div>
+        <p class="chart-note" id="chartNote" hidden>Dots mark month-end values taken from brokerage statements; some are estimated from the statement's monthly changes. Later points are daily snapshots.</p>
       </div>
       <div class="card">
         <div class="card-head"><h2>Allocation</h2></div>
@@ -400,6 +402,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--link);outline-o
       document.querySelector(".ranges").style.display = "none";
       return;
     }
+    $("chartNote").hidden = !points.some(p => p.source);
     const last = new Date(points[points.length - 1].date);
     const cutoff = range => {
       const d = new Date(last);
@@ -419,20 +422,26 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--link);outline-o
       el.textContent = pct(change) + " over period";
       el.className = "period num " + cls(change);
       const line = css("--navy");
-      const data = { labels: pts.map(p => p.date), datasets: [{ data: pts.map(p => p.value), borderColor: line, borderWidth: 2,
-        pointRadius: 0, pointHoverRadius: 4, tension: 0.15, fill: true,
+      // A numeric time axis keeps monthly statement points and daily snapshots spaced by real time.
+      const data = { datasets: [{ data: pts.map(p => ({ x: new Date(p.date + "T12:00:00Z").getTime(), y: p.value, source: p.source })),
+        borderColor: line, borderWidth: 2, pointBackgroundColor: line, pointBorderWidth: 0,
+        pointRadius: ctx => (ctx.raw && ctx.raw.source ? 2.5 : 0), pointHoverRadius: 4, tension: 0.15, fill: true,
         backgroundColor: ctx => { const g = ctx.chart.ctx.createLinearGradient(0, 0, 0, ctx.chart.height); g.addColorStop(0, line + "33"); g.addColorStop(1, line + "00"); return g; } }] };
       if (valueChart) { valueChart.data = data; valueChart.update(); return; }
       valueChart = new Chart($("valueChart"), {
         type: "line", data,
         options: {
-          maintainAspectRatio: false, interaction: { mode: "index", intersect: false },
+          maintainAspectRatio: false, interaction: { mode: "nearest", axis: "x", intersect: false },
           plugins: { legend: { display: false }, tooltip: { callbacks: {
-            title: i => new Date(i[0].label).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }),
-            label: c => " " + usd0.format(c.parsed.y) } } },
+            title: i => new Date(i[0].parsed.x).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }),
+            label: c => " " + usd0.format(c.parsed.y),
+            afterLabel: c => ({ statement: " Month-end, from statement", estimate: " Month-end, estimated from statement" }[c.raw.source] || "") } } },
           scales: {
-            x: { grid: { display: false }, border: { color: css("--line") }, ticks: { color: css("--muted"), maxTicksLimit: window.innerWidth < 600 ? 4 : 6, maxRotation: 0,
-              callback(v) { return new Date(this.getLabelForValue(v)).toLocaleDateString("en-GB", { month: "short", year: "2-digit" }); } } },
+            x: { type: "linear", grid: { display: false }, border: { color: css("--line") }, ticks: { color: css("--muted"), maxTicksLimit: window.innerWidth < 600 ? 4 : 6, maxRotation: 0,
+              callback(v) {
+                const short = this.max - this.min < 100 * 864e5;
+                return new Date(v).toLocaleDateString("en-GB", short ? { day: "numeric", month: "short", timeZone: "UTC" } : { month: "short", year: "2-digit", timeZone: "UTC" });
+              } } },
             y: { grid: { color: css("--line") }, border: { display: false }, ticks: { color: css("--muted"), callback: v => usd0.format(v) } }
           }
         }

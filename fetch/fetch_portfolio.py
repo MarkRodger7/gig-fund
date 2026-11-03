@@ -8,6 +8,9 @@ Run once per trading day after the US market close (16:00 US Eastern).
     python fetch/fetch_portfolio.py --reencrypt      # no E*TRADE login: re-encrypt
                                                      # existing data, e.g. after
                                                      # changing SITE_PASSWORD
+    python fetch/fetch_portfolio.py --import-history fetch/private/history_import.csv
+                                                     # merge past month-end values
+                                                     # from statements, re-encrypt
 
 The script opens the E*TRADE authorisation page, asks for the verification
 code shown after you log in, then writes:
@@ -24,6 +27,7 @@ from __future__ import annotations
 
 import argparse
 import base64
+import csv
 import json
 import os
 import secrets
@@ -264,6 +268,39 @@ def build_snapshot(raw_positions: list[dict], account_value: float | None, env: 
     }
 
 
+def import_history(csv_path: Path) -> dict:
+    """Merge past values (e.g. month-ends from E*TRADE statements) into history.
+
+    CSV columns: date (YYYY-MM-DD), value, and optional source ("statement" for
+    a figure printed on a statement, "estimate" for one derived from it).
+    Existing points win on the same date, so daily snapshots are never replaced.
+    """
+    history = {"sample": False, "points": []}
+    if HISTORY_FILE.exists():
+        existing = json.loads(HISTORY_FILE.read_text())
+        if not existing.get("sample"):
+            history = existing
+    by_date = {p["date"]: p for p in history.get("points", [])}
+
+    added = 0
+    with csv_path.open(newline="", encoding="utf-8-sig") as fh:
+        for row in csv.DictReader(fh):
+            day = (row.get("date") or "").strip()
+            try:
+                datetime.strptime(day, "%Y-%m-%d")
+                value = float((row.get("value") or "").replace(",", "").replace("$", ""))
+            except ValueError:
+                sys.exit(f"Bad row in {csv_path.name}: {row}")
+            if day in by_date:
+                continue
+            source = (row.get("source") or "statement").strip() or "statement"
+            by_date[day] = {"date": day, "value": round(value, 2), "source": source}
+            added += 1
+
+    print(f"Imported {added} point(s) from {csv_path.name}; {len(by_date)} in history.")
+    return {"sample": False, "points": sorted(by_date.values(), key=lambda p: p["date"])}
+
+
 def update_history(snapshot: dict) -> dict:
     history = {"sample": False, "points": []}
     if HISTORY_FILE.exists():
@@ -343,10 +380,18 @@ def main() -> None:
     parser.add_argument("--publish", action="store_true", help="commit and push the encrypted vault")
     parser.add_argument("--reencrypt", action="store_true", help="re-encrypt existing data without fetching")
     parser.add_argument("--env", choices=["sandbox", "production"], help="override ETRADE_ENV")
+    parser.add_argument("--import-history", metavar="CSV", type=Path,
+                        help="merge past values from a date,value[,source] CSV, then re-encrypt (no login)")
     args = parser.parse_args()
 
     password = site_password()
     PRIVATE_DIR.mkdir(parents=True, exist_ok=True)
+
+    if args.import_history:
+        if not args.import_history.exists():
+            sys.exit(f"{args.import_history} not found.")
+        HISTORY_FILE.write_text(json.dumps(import_history(args.import_history), indent=2))
+        args.reencrypt = True
 
     if args.reencrypt:
         if not PORTFOLIO_FILE.exists():

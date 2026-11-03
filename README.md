@@ -82,6 +82,16 @@ python fetch/fetch_portfolio.py --publish
 
 This logs in, writes and encrypts the snapshot, commits `docs/data/vault.json` and pushes. The live site updates within a couple of minutes. Switch `ETRADE_ENV=production` in `fetch/.env` once live keys are approved.
 
+## Adding past values from statements
+
+The E*TRADE API has no history, so earlier values come from monthly statements. Put them in `fetch/private/history_import.csv` (git-ignored) as `date,value,source` rows, where `source` is `statement` for a printed month-end value or `estimate` for one derived from the statement's monthly % changes. Then run:
+
+```bash
+python fetch/fetch_portfolio.py --import-history fetch/private/history_import.csv --publish
+```
+
+Existing points are never overwritten, so it is safe to re-run with more rows. Imported points show as dots on the chart, with their source in the tooltip. Keep statement PDFs out of the repository; they hold the account holder's name, address and full account number.
+
 ## Managing the password
 
 - **Share it** with members privately, not in a public channel.
