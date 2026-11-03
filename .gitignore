@@ -1,0 +1,6 @@
+fetch/.env
+fetch/private/
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
