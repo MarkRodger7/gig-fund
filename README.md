@@ -99,4 +99,4 @@ Symbols, quantities, prices, market values, cost basis, gains, cash, total value
 ## Customising
 
 - `PORTFOLIO_NAME` in `fetch/.env` sets the name shown after login.
-- Colours and fonts are CSS variables at the top of `docs/index.html`; dark mode follows the visitor's system setting.
+- Styling follows the GIG house style (black and white, navy #0e102c, slate #5c6b81; Arial/Helvetica body, Work Sans headings). Colours are CSS variables at the top of `docs/index.html`; dark mode follows the visitor's system setting. The logo is `docs/assets/gig-logo.png`.

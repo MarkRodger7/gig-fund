@@ -3,96 +3,135 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Portfolio Holdings</title>
-<meta name="description" content="Members-only portfolio holdings.">
+<title>GIG · Portfolio Holdings</title>
+<meta name="description" content="Global Investment Group members-only portfolio holdings.">
 <meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/png" href="assets/gig-logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
+/* GIG house style: black and white, deep navy accent, slate blue-grey text. */
 :root{
-  --bg:#f6f5f1; --surface:#ffffff; --ink:#16181d; --muted:#6b6f78; --line:#e3e1da;
-  --accent:#1f4f8f; --accent-soft:#e6edf7; --up:#137a4b; --down:#b3261e; --banner:#fff4d6;
-  --c1:#1f4f8f;--c2:#3d7cc9;--c3:#7aa7dd;--c4:#137a4b;--c5:#59a97a;--c6:#b08a2e;--c7:#8c5ea8;--c8:#c26a4a;--c9:#9aa0aa;
+  --bg:#ffffff; --surface:#ffffff; --ink:#000000; --navy:#0e102c; --muted:#5c6b81; --line:#d9dde4; --soft:#f3f4f7;
+  --band:#000000; --band-ink:#ffffff; --link:#0000ee;
+  --accent:#0e102c; --accent-ink:#ffffff; --up:#13774a; --down:#b3261e; --banner:#f3f4f7;
+  --c1:#0e102c;--c2:#2b3358;--c3:#465277;--c4:#5c6b81;--c5:#7b8899;--c6:#9aa5b4;--c7:#bcc4cf;--c8:#3a3a3a;--c9:#e3e6eb;
+  color-scheme:light;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --bg:#0f1115; --surface:#171a20; --ink:#e8e9ec; --muted:#9097a3; --line:#2a2e36;
-    --accent:#7fb0ff; --accent-soft:#1b2638; --up:#4cc38a; --down:#ff7a70; --banner:#3a3016;
-    --c1:#7fb0ff;--c2:#4e8de0;--c3:#a9c8f5;--c4:#4cc38a;--c5:#8ad6a9;--c6:#d9b45a;--c7:#b98ad6;--c8:#e3906f;--c9:#6f7682;
+    --bg:#06071a; --surface:#0e102c; --ink:#ffffff; --navy:#e6e9f2; --muted:#9aa6b8; --line:#262a4a; --soft:#171a3a;
+    --link:#8ea2ff; --accent:#ffffff; --accent-ink:#0e102c; --up:#4cc38a; --down:#ff7a70; --banner:#171a3a;
+    --c1:#ffffff;--c2:#cfd5e2;--c3:#a6b0c3;--c4:#8090a8;--c5:#5c6b81;--c6:#46527a;--c7:#2f3760;--c8:#9e9e9e;--c9:#1d2142;
+    color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
-  --bg:#0f1115; --surface:#171a20; --ink:#e8e9ec; --muted:#9097a3; --line:#2a2e36;
-  --accent:#7fb0ff; --accent-soft:#1b2638; --up:#4cc38a; --down:#ff7a70; --banner:#3a3016;
-  --c1:#7fb0ff;--c2:#4e8de0;--c3:#a9c8f5;--c4:#4cc38a;--c5:#8ad6a9;--c6:#d9b45a;--c7:#b98ad6;--c8:#e3906f;--c9:#6f7682;
+  --bg:#06071a; --surface:#0e102c; --ink:#ffffff; --navy:#e6e9f2; --muted:#9aa6b8; --line:#262a4a; --soft:#171a3a;
+  --link:#8ea2ff; --accent:#ffffff; --accent-ink:#0e102c; --up:#4cc38a; --down:#ff7a70; --banner:#171a3a;
+  --c1:#ffffff;--c2:#cfd5e2;--c3:#a6b0c3;--c4:#8090a8;--c5:#5c6b81;--c6:#46527a;--c7:#2f3760;--c8:#9e9e9e;--c9:#1d2142;
+  color-scheme:dark;
 }
 *{box-sizing:border-box}
 html,body{margin:0}
-body{background:var(--bg);color:var(--ink);font:15px/1.5 "IBM Plex Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
-.num{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 Arial,Helvetica,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:var(--link)}
+.ws{font-family:"Work Sans",Arial,Helvetica,sans-serif}
+.num{font-family:Arial,Helvetica,sans-serif;font-variant-numeric:tabular-nums}
+
+/* Masthead: black band with the shield logo inverted to white. */
+.masthead{background:var(--band);color:var(--band-ink);padding-top:env(safe-area-inset-top,0px)}
+.masthead-inner{max-width:1180px;margin:0 auto;padding:14px 16px;display:flex;align-items:center;gap:14px}
+.logo{display:block;flex:none;overflow:hidden;aspect-ratio:240/275;width:38px}
+.logo img{display:block;width:155.4%;max-width:none;margin:-18.75% 0 0 -27.1%;filter:invert(1)}
+.brand{font:600 15px/1.2 "Work Sans",Arial,Helvetica,sans-serif;letter-spacing:.14em;text-transform:uppercase}
+.brand small{display:block;font-weight:400;font-size:11px;letter-spacing:.18em;color:#9aa6b8;margin-top:3px}
+.masthead .signout{margin-left:auto}
+
 .wrap{max-width:1180px;margin:0 auto;padding:32px 16px 48px}
-header{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;border-bottom:2px solid var(--ink);padding-bottom:16px;margin-bottom:24px}
-.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 4px}
-h1{font-size:30px;font-weight:600;margin:0;letter-spacing:-.01em}
+header{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;border-bottom:3px solid var(--ink);padding-bottom:16px;margin-bottom:24px}
+.eyebrow{font:600 12px "Work Sans",Arial,Helvetica,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+h1{font:600 32px/1.15 "Work Sans",Arial,Helvetica,sans-serif;margin:0;letter-spacing:-.015em;color:var(--navy)}
 .asof{color:var(--muted);font-size:13px;text-align:right}
-.banner{background:var(--banner);border:1px solid var(--line);border-radius:6px;padding:10px 14px;font-size:13px;margin-bottom:20px;display:none}
-.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-bottom:24px}
-.kpi{background:var(--surface);padding:18px 20px}
-.kpi .label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
-.kpi .value{font-size:26px;font-weight:500;margin-top:6px}
-.kpi .sub{font-size:13px;margin-top:2px}
-.up{color:var(--up)} .down{color:var(--down)}
-.grid{display:grid;grid-template-columns:1.7fr 1fr;gap:20px;margin-bottom:24px}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:18px 20px;min-width:0}
-.card h2{font-size:14px;font-weight:600;margin:0;text-transform:uppercase;letter-spacing:.08em}
-.card-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
-.ranges{display:flex;gap:4px}
-.ranges button{font:500 12px "IBM Plex Mono",monospace;border:1px solid var(--line);background:transparent;color:var(--muted);padding:4px 9px;border-radius:4px;cursor:pointer}
-.ranges button[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
-.period{font-size:13px}
+.banner{background:var(--banner);border-left:4px solid var(--navy);padding:10px 14px;font-size:13px;margin-bottom:20px;display:none}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-top:4px solid var(--navy);padding:16px 18px}
+.kpi .label{font:600 11px "Work Sans",Arial,Helvetica,sans-serif;color:var(--muted);text-transform:uppercase;letter-spacing:.14em}
+.kpi .value{font-size:27px;font-weight:700;margin-top:8px;color:var(--navy);letter-spacing:-.01em}
+.kpi .value.up{color:var(--up)} .kpi .value.down{color:var(--down)}
+.kpi .sub{font-size:13px;margin-top:2px;color:var(--muted)}
+.up{color:var(--up)!important} .down{color:var(--down)!important}
+.grid{display:grid;grid-template-columns:1.7fr 1fr;gap:16px;margin-bottom:24px}
+.card{background:var(--surface);border:1px solid var(--line);padding:18px 20px;min-width:0}
+.card h2{font:600 13px "Work Sans",Arial,Helvetica,sans-serif;margin:0;text-transform:uppercase;letter-spacing:.14em;color:var(--ink);padding-left:10px;border-left:4px solid var(--ink)}
+.card-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.ranges{display:flex;gap:0;border:1px solid var(--ink)}
+.ranges button{font:600 12px "Work Sans",Arial,Helvetica,sans-serif;letter-spacing:.06em;border:0;border-left:1px solid var(--ink);background:transparent;color:var(--ink);padding:5px 11px;cursor:pointer}
+.ranges button:first-child{border-left:0}
+.ranges button:hover{background:var(--soft)}
+.ranges button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.period{font-size:13px;font-weight:700}
 .grid>.card:first-child{display:flex;flex-direction:column}
 .chart-box{position:relative;height:280px;flex:1 1 auto;min-height:280px}
 .alloc-box{position:relative;height:200px;margin-bottom:12px}
 .legend{list-style:none;padding:0;margin:0;font-size:13px}
 .legend li{display:flex;align-items:center;gap:8px;padding:3px 0}
-.legend .sw{width:10px;height:10px;border-radius:2px;flex:none}
+.legend .sw{width:10px;height:10px;flex:none;outline:1px solid var(--line)}
 .legend .pct{margin-left:auto;color:var(--muted)}
 .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
 table{width:100%;border-collapse:collapse;font-size:14px;min-width:820px}
-th{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);text-align:right;padding:8px 10px;border-bottom:1px solid var(--ink);cursor:pointer;user-select:none;white-space:nowrap}
+th{font:600 11px "Work Sans",Arial,Helvetica,sans-serif;text-transform:uppercase;letter-spacing:.12em;color:var(--band-ink);background:var(--band);text-align:right;padding:10px;cursor:pointer;user-select:none;white-space:nowrap}
 th:first-child,td:first-child{text-align:left}
 th[aria-sort="ascending"]::after{content:" ▲"} th[aria-sort="descending"]::after{content:" ▼"}
 td{padding:10px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
-tbody tr:hover{background:var(--accent-soft)}
-td.sym{font-weight:600}
+tbody tr:nth-child(even){background:var(--soft)}
+tbody tr:hover{background:var(--line)}
+td.sym{font:600 14px "Work Sans",Arial,Helvetica,sans-serif;color:var(--navy);letter-spacing:.02em}
 .wbar{display:inline-flex;align-items:center;gap:8px;justify-content:flex-end}
-.wbar span.bar{display:inline-block;height:6px;background:var(--accent);border-radius:3px}
-tfoot td{font-weight:600;border-top:1px solid var(--ink);border-bottom:none}
-footer{color:var(--muted);font-size:12px;margin-top:28px;line-height:1.6}
+.wbar span.bar{display:inline-block;height:6px;background:var(--muted)}
+tfoot td{font-weight:700;border-top:2px solid var(--ink);border-bottom:none;color:var(--navy)}
+footer{color:var(--muted);font-size:12px;margin-top:28px;line-height:1.6;border-top:1px solid var(--line);padding-top:16px}
 .error{padding:40px;text-align:center;color:var(--muted)}
 [hidden]{display:none!important}
 .gate{min-height:70vh;display:grid;place-items:center}
-.gate form{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:28px 24px;width:100%;max-width:380px;display:grid;gap:14px}
-.gate h1{font-size:22px}
+.gate form{background:var(--surface);border:1px solid var(--ink);width:100%;max-width:400px;display:grid;gap:14px;padding:0 0 26px}
+.gate form>*:not(.gate-band){margin-left:26px;margin-right:26px}
+.gate-band{background:var(--band);display:grid;place-items:center;padding:26px 0 22px;margin-bottom:6px;gap:12px}
+.gate-band .logo{width:78px}
+.gate-band .brand{color:var(--band-ink);text-align:center}
+.gate h1{font-size:24px}
 .gate p{margin:0;color:var(--muted);font-size:14px}
-.gate label{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
-.gate input[type=password]{width:100%;font:15px "IBM Plex Mono",ui-monospace,monospace;padding:10px 12px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink)}
-.gate .remember{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--ink);text-transform:none;letter-spacing:0;font-weight:400}
-.gate button,.signout{font:600 14px "IBM Plex Sans",system-ui,sans-serif;background:var(--accent);color:var(--surface);border:0;border-radius:6px;padding:10px 14px;cursor:pointer}
+.gate label{font:600 11px "Work Sans",Arial,Helvetica,sans-serif;text-transform:uppercase;letter-spacing:.14em;color:var(--muted)}
+.gate input[type=password]{width:100%;font:15px Arial,Helvetica,sans-serif;padding:11px 12px;border:1px solid var(--muted);border-radius:0;background:var(--bg);color:var(--ink)}
+.gate .remember{display:flex;align-items:center;gap:8px;font:400 14px Arial,Helvetica,sans-serif;color:var(--ink);text-transform:none;letter-spacing:0}
+.gate button,.signout{font:600 13px "Work Sans",Arial,Helvetica,sans-serif;letter-spacing:.14em;text-transform:uppercase;background:var(--accent);color:var(--accent-ink);border:0;border-radius:0;padding:12px 14px;cursor:pointer}
+.gate button:hover{opacity:.88}
 .gate button[disabled]{opacity:.6;cursor:wait}
 .gate .err{color:var(--down);font-size:13px;min-height:1em}
-.signout{background:transparent;color:var(--muted);border:1px solid var(--line);padding:4px 10px;font-size:12px;margin-top:6px}
-button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.signout{background:transparent;color:var(--band-ink);border:1px solid #5c6b81;padding:6px 12px;font-size:11px}
+.signout:hover{border-color:var(--band-ink)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--link);outline-offset:2px}
 @media (max-width:900px){.grid{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,1fr)}}
-@media (max-width:480px){.kpi .value{font-size:21px}h1{font-size:24px}.asof{text-align:left}}
+@media (max-width:480px){.kpis{gap:10px}.kpi{padding:12px 14px}.kpi .value{font-size:21px}h1{font-size:25px}.asof{text-align:left}.brand small{display:none}.gate form>*:not(.gate-band){margin-left:18px;margin-right:18px}}
 </style>
 </head>
 <body>
+<div class="masthead">
+  <div class="masthead-inner">
+    <span class="logo"><img src="assets/gig-logo.png" alt="GIG logo"></span>
+    <div class="brand">Global Investment Group<small>Members' portfolio</small></div>
+    <button class="signout" id="signout" type="button" hidden>Sign out</button>
+  </div>
+</div>
 <div class="wrap">
   <section class="gate" id="gate">
     <form id="loginForm" autocomplete="on">
+      <div class="gate-band">
+        <span class="logo"><img src="assets/gig-logo.png" alt=""></span>
+        <div class="brand">Global Investment Group</div>
+      </div>
       <p class="eyebrow">Members only</p>
       <h1>Portfolio holdings</h1>
       <p>Enter the password shared with members to view the portfolio.</p>
@@ -111,7 +150,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
       <p class="eyebrow">Portfolio holdings</p>
       <h1 id="name">Portfolio</h1>
     </div>
-    <div class="asof"><div id="asof"></div><button class="signout" id="signout" type="button">Sign out</button></div>
+    <div class="asof" id="asof"></div>
   </header>
 
   <div class="banner" id="banner">Showing sample data. Figures will be replaced by the first live snapshot.</div>
@@ -222,6 +261,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
   function showApp(data) {
     $("gate").hidden = true;
     $("app").hidden = false;
+    $("signout").hidden = false;
     render(data.portfolio, (data.history && data.history.points) || []);
   }
 
@@ -267,7 +307,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 
   function render(p, history) {
     const t = p.totals;
-    document.title = p.name + " · Holdings";
+    document.title = "GIG · " + p.name;
     $("name").textContent = p.name;
     const d = new Date(p.asOf);
     $("asof").innerHTML = "As of " + d.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "America/New_York" }) +
@@ -378,8 +418,8 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
       const el = $("period");
       el.textContent = pct(change) + " over period";
       el.className = "period num " + cls(change);
-      const line = change >= 0 ? css("--up") : css("--down");
-      const data = { labels: pts.map(p => p.date), datasets: [{ data: pts.map(p => p.value), borderColor: line, borderWidth: 1.75,
+      const line = css("--navy");
+      const data = { labels: pts.map(p => p.date), datasets: [{ data: pts.map(p => p.value), borderColor: line, borderWidth: 2,
         pointRadius: 0, pointHoverRadius: 4, tension: 0.15, fill: true,
         backgroundColor: ctx => { const g = ctx.chart.ctx.createLinearGradient(0, 0, 0, ctx.chart.height); g.addColorStop(0, line + "33"); g.addColorStop(1, line + "00"); return g; } }] };
       if (valueChart) { valueChart.data = data; valueChart.update(); return; }
